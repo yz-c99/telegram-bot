@@ -1,0 +1,11 @@
+target_chats:
+  - chat_id: "example_channel"
+    name: "サンプルチャット"
+    enabled: true
+
+filters:
+  min_message_length: 10
+  exclude_patterns:
+    - "^おはよう$"
+    - "^ありがとう$"
+    - "^了解$"

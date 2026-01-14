@@ -1,0 +1,19 @@
+# Telegram API
+telethon==1.35.0
+
+# Google APIs
+google-auth==2.25.2
+google-auth-oauthlib==1.2.0
+google-api-python-client==2.110.0
+
+# Gemini API
+google-generativeai==0.3.0
+
+# 設定管理
+python-dotenv==1.0.0
+PyYAML==6.0.1
+
+# ユーティリティ
+pytz==2023.3
+python-dateutil==2.8.2
+colorlog==6.8.0
