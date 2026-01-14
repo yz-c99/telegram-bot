@@ -1,0 +1,84 @@
+{
+  "project": "telegram-to-gdocs",
+  "description": "Telegram to Google Docs Auto-Collector with NotebookLM integration",
+
+  "deny": [
+    "Bash(diskutil eraseDisk:*)",
+    "Bash(mkfs:*)",
+    "Bash(fdisk:*)",
+    "Bash(parted:*)",
+    "Bash(dd:*)",
+    "Bash(rm -rf /:*)",
+    "Bash(chmod -R /:*)",
+    "Bash(chown -R /:*)",
+    "Bash(git reset --hard:*)",
+    "Bash(git clean -fdx:*)",
+    "Bash(git push --force:*)",
+    "Bash(docker system prune:*)",
+    "Bash(sqlite3 data/state.db \"DROP *\")",
+    "Bash(sqlite3 data/state.db \"DELETE FROM *\")",
+    "Read(**/.env*)",
+    "Read(**/.ssh/**)",
+    "Read(**/credentials/**)",
+    "Read(**/telegram_session/*.session*)",
+    "Edit(**/.env*)",
+    "Edit(**/credentials/**)",
+    "Edit(**/telegram_session/*.session*)",
+    "Write(**/.env*)",
+    "Write(**/credentials/**)",
+    "Write(**/telegram_session/*.session*)"
+  ],
+
+  "cost_limits": {
+    "gemini_api_daily_requests": 1,
+    "gemini_api_monthly_cost_usd": 0,
+    "total_monthly_cost_usd": 0
+  },
+
+  "security_rules": {
+    "never_commit": [
+      ".env",
+      "credentials/*.json",
+      "credentials/*.pickle",
+      "data/telegram_session/*.session",
+      "data/*.db"
+    ],
+    "api_key_handling": "NEVER hardcode API keys in code. Always use environment variables.",
+    "sensitive_data": "NEVER log or print API keys, tokens, or passwords."
+  },
+
+  "architecture_constraints": {
+    "message_collection": "MUST use message_id tracking, not time-based",
+    "read_acknowledgment": "MUST call send_read_acknowledge() after message collection",
+    "gemini_api_calls": "MUST limit to 1 call per day (free tier: 20 requests/day)",
+    "theme_extraction": "MUST organize ALL messages by theme without limit on number of themes",
+    "output_format": "MUST generate NotebookLM-optimized structured Markdown"
+  },
+
+  "file_boundaries": {
+    "do_not_modify": [
+      ".env",
+      "credentials/",
+      "data/telegram_session/"
+    ],
+    "safe_to_modify": [
+      "src/",
+      "config/",
+      "scripts/",
+      "cron/",
+      "README.md",
+      "PLANS.md",
+      "CLAUDE.md"
+    ]
+  },
+
+  "testing_requirements": {
+    "before_deploy": [
+      "Run scripts/test_connection.py",
+      "Verify Telegram authentication",
+      "Verify Google Docs authentication",
+      "Verify Gemini API key",
+      "Test end-to-end with python src/main.py --test"
+    ]
+  }
+}
