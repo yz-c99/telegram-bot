@@ -104,13 +104,12 @@ pip list | grep google
 
 ## Milestone 2: 設定管理モジュール
 
-**目標**: YAMLとenvファイルから設定を読み込むモジュールを実装
+**目標**: YAMLとenvファイルから設定を読み込むシンプルなモジュールを実装
 
 **スコープ**:
 - 環境変数の読み込み
 - YAMLファイルの読み込み
-- 設定のバリデーション
-- ロギング設定
+- 基本的なロギング設定
 
 **タスク**:
 1. config/target_chats.yaml を作成
@@ -126,47 +125,19 @@ pip list | grep google
        - "^おはよう$"
        - "^ありがとう$"
        - "^了解$"
-     exclude_stickers: true
-     exclude_system_messages: true
    ```
 
-2. config/logging_config.yaml を作成
-   ```yaml
-   version: 1
-   disable_existing_loggers: false
-   formatters:
-     detailed:
-       format: '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)d] %(message)s'
-   handlers:
-     console:
-       class: logging.StreamHandler
-       level: INFO
-       formatter: detailed
-     file:
-       class: logging.handlers.RotatingFileHandler
-       level: DEBUG
-       formatter: detailed
-       filename: logs/app.log
-       maxBytes: 10485760
-       backupCount: 5
-   root:
-     level: DEBUG
-     handlers: [console, file]
-   ```
-
-3. config/settings.py を実装
+2. config/settings.py を実装
    - 環境変数読み込み（python-dotenv）
    - YAML読み込み（PyYAML）
-   - 設定クラスの定義
-   - バリデーション機能
+   - シンプルな設定クラス
 
-4. src/utils/logger.py を実装
-   - ロギング設定の初期化
-   - カスタムロガーの作成
+3. src/utils/logger.py を実装
+   - 基本的なロギング設定（コード内で定義、YAMLファイル不要）
+   - ファイルとコンソール出力
 
 **成果物**:
 - config/target_chats.yaml
-- config/logging_config.yaml
 - config/settings.py
 - src/utils/logger.py
 
@@ -176,7 +147,7 @@ python -c "from config.settings import Settings; s = Settings(); print(s.telegra
 python -c "from src.utils.logger import get_logger; logger = get_logger('test'); logger.info('Test')"
 ```
 
-**想定時間**: 2-3時間
+**想定時間**: 1時間
 
 ---
 
@@ -243,7 +214,7 @@ print(db.get_last_message_id('test_chat'))
 sqlite3 data/state.db "SELECT * FROM chat_state;"
 ```
 
-**想定時間**: 2-3時間
+**想定時間**: 1.5-2時間
 
 ---
 
@@ -298,53 +269,34 @@ client = TelegramClient()
 "
 ```
 
-**想定時間**: 3-4時間
+**想定時間**: 2.5-3時間
 
 ---
 
 ## Milestone 5: フィルタリングモジュール
 
-**目標**: ノイズメッセージを除去するフィルタリング機能を実装
+**目標**: 基本的なノイズメッセージを除去する機能を実装
 
 **スコープ**:
 - 短文フィルタ
-- パターンマッチングフィルタ
-- スタンプ・システムメッセージ除去
+- 基本パターンマッチング
 
 **タスク**:
 1. src/filters/content_filter.py を実装
-   - `ContentFilter` クラス
-   - `filter_short_messages(messages, min_length)`: 短文除去
-   - `filter_by_patterns(messages, patterns)`: パターンマッチ
-   - `filter_system_messages(messages)`: システムメッセージ除去
-   - `apply_all_filters(messages)`: 全フィルタ適用
-
-2. フィルタロジック
-   ```python
-   - 10文字未満のメッセージ除去
-   - 除外パターン（挨拶、相槌）のマッチング
-   - スタンプ・ステッカーのみのメッセージ除去
-   - システムメッセージ（「XXXが参加しました」等）除去
-   ```
+   - `filter_messages(messages, config)`: 単一関数でシンプルに処理
+   - 10文字未満の除去
+   - 設定ファイルのパターンマッチング
+   - システムメッセージ除去
 
 **成果物**:
 - src/filters/content_filter.py
 
 **検証**:
 ```bash
-python -c "
-from src.filters.content_filter import ContentFilter
-filter = ContentFilter()
-messages = [
-    {'text': 'おはよう', 'id': 1},
-    {'text': 'これは重要なメッセージです。詳細は以下の通り...', 'id': 2},
-]
-filtered = filter.apply_all_filters(messages)
-print(len(filtered))  # 1 (短文が除去された)
-"
+python -c "from src.filters.content_filter import filter_messages; print('OK')"
 ```
 
-**想定時間**: 1-2時間
+**想定時間**: 0.5時間
 
 ---
 
@@ -413,7 +365,7 @@ print(result[:200])  # Markdown確認
 "
 ```
 
-**想定時間**: 3-4時間
+**想定時間**: 2.5-3時間
 
 ---
 
@@ -462,7 +414,7 @@ print(f'Document ID: {doc_id}')
 "
 ```
 
-**想定時間**: 3-4時間
+**想定時間**: 2-3時間
 
 ---
 
@@ -534,7 +486,7 @@ tail -f logs/app.log
 sqlite3 data/state.db "SELECT * FROM processing_log ORDER BY created_at DESC LIMIT 1;"
 ```
 
-**想定時間**: 2-3時間
+**想定時間**: 2時間
 
 ---
 
@@ -591,7 +543,7 @@ tail -f logs/cron.log
 ls -l logs/
 ```
 
-**想定時間**: 1時間
+**想定時間**: 0.5時間
 
 ---
 
@@ -654,7 +606,7 @@ python scripts/get_chat_ids.py
 cat README.md
 ```
 
-**想定時間**: 3-4時間
+**想定時間**: 2時間
 
 ---
 
@@ -663,16 +615,16 @@ cat README.md
 | マイルストーン | 時間 |
 |--------------|------|
 | 1. プロジェクトセットアップ | 1時間 |
-| 2. 設定管理モジュール | 2-3時間 |
-| 3. データベースモジュール | 2-3時間 |
-| 4. Telegram収集モジュール | 3-4時間 |
-| 5. フィルタリングモジュール | 1-2時間 |
-| 6. Gemini AI処理モジュール | 3-4時間 |
-| 7. ドキュメント生成モジュール | 3-4時間 |
-| 8. メイン統合モジュール | 2-3時間 |
-| 9. スケジューリング設定 | 1時間 |
-| 10. テスト・ドキュメント | 3-4時間 |
-| **合計** | **21-31時間** |
+| 2. 設定管理モジュール | 1時間 |
+| 3. データベースモジュール | 1.5-2時間 |
+| 4. Telegram収集モジュール | 2.5-3時間 |
+| 5. フィルタリングモジュール | 0.5時間 |
+| 6. Gemini AI処理モジュール | 2.5-3時間 |
+| 7. ドキュメント生成モジュール | 2-3時間 |
+| 8. メイン統合モジュール | 2時間 |
+| 9. スケジューリング設定 | 0.5時間 |
+| 10. テスト・ドキュメント | 2時間 |
+| **合計** | **15.5-20時間** |
 
 ---
 
