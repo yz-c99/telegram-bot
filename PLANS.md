@@ -266,6 +266,7 @@ sqlite3 data/state.db "SELECT * FROM chat_state;"
 2. src/telegram_client/message_fetcher.py を実装
    - `fetch_new_messages(chat_id, last_message_id)`: 新規メッセージ取得
    - message_id追跡ロジック
+   - **初回実行時の処理**: last_message_idが存在しない場合、直近24時間のメッセージを取得
    - メタデータ抽出（送信者、時刻、チャット名）
 
 3. src/telegram_client/message_reader.py を実装
@@ -611,7 +612,12 @@ ls -l logs/
    - Gemini API接続テスト
    - データベーステスト
 
-2. README.md を作成
+2. scripts/get_chat_ids.py を作成
+   - 参加中のチャット・グループ・チャンネル一覧を表示
+   - 各チャットのID（識別番号）を表示
+   - 設定ファイル（config/target_chats.yaml）にコピー可能な形式で出力
+
+3. README.md を作成
    - プロジェクト概要
    - 必要な前提条件
    - セットアップ手順
@@ -625,13 +631,14 @@ ls -l logs/
    - トラブルシューティング
    - FAQ
 
-3. ドキュメント作成
+4. ドキュメント作成
    - API取得ガイド（Telegram, Gemini, Google）
-   - チャットID確認方法
+   - チャットID確認方法（scripts/get_chat_ids.py の使用方法）
    - エラー対処法
 
 **成果物**:
 - scripts/test_connection.py
+- scripts/get_chat_ids.py
 - README.md
 - docs/（任意）
 
@@ -640,11 +647,14 @@ ls -l logs/
 # 接続テスト
 python scripts/test_connection.py
 
+# チャットID確認
+python scripts/get_chat_ids.py
+
 # README確認
 cat README.md
 ```
 
-**想定時間**: 2-3時間
+**想定時間**: 3-4時間
 
 ---
 
@@ -661,8 +671,8 @@ cat README.md
 | 7. ドキュメント生成モジュール | 3-4時間 |
 | 8. メイン統合モジュール | 2-3時間 |
 | 9. スケジューリング設定 | 1時間 |
-| 10. テスト・ドキュメント | 2-3時間 |
-| **合計** | **20-30時間** |
+| 10. テスト・ドキュメント | 3-4時間 |
+| **合計** | **21-31時間** |
 
 ---
 
@@ -685,6 +695,7 @@ cat README.md
 ### message_id追跡
 - 各チャットの最後の`message_id`を必ずSQLiteに記録
 - 次回実行時はこのIDから取得開始
+- **初回実行時**: last_message_idが存在しない場合、直近24時間のメッセージを取得
 - システム障害時は24時間前からフォールバック
 
 ### エラーハンドリング
