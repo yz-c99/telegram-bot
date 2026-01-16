@@ -12,13 +12,13 @@ logger = get_logger(__name__)
 class GeminiClient:
     """Client for interacting with Google's Gemini API."""
 
-    def __init__(self, api_key: str, model_name: str = "gemini-pro"):
+    def __init__(self, api_key: str, model_name: str = "gemini-flash-latest"):
         """
         Initialize Gemini API client.
 
         Args:
             api_key: Gemini API key
-            model_name: Model to use (default: gemini-pro)
+            model_name: Model to use (default: gemini-flash-latest)
         """
         self.api_key = api_key
         self.model_name = model_name
