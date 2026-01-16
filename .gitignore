@@ -13,6 +13,9 @@ data/telegram_session/*.session-journal
 # データベース
 data/*.db
 
+# Markdownバックアップ
+data/markdown_backup/*.md
+
 # ログ
 logs/*.log
 
