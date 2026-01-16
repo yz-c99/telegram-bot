@@ -1,6 +1,6 @@
 """Message fetching module for retrieving new Telegram messages."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 from telethon import TelegramClient
@@ -43,7 +43,9 @@ class MessageFetcher:
         """
         try:
             # Get chat entity
-            chat = await self.client.get_entity(chat_id)
+            # Convert numeric chat_id to integer for group chats
+            entity_id = int(chat_id) if chat_id.lstrip('-').isdigit() else chat_id
+            chat = await self.client.get_entity(entity_id)
             chat_name = getattr(chat, "title", None) or getattr(chat, "username", None) or str(chat_id)
 
             messages = []
@@ -51,7 +53,7 @@ class MessageFetcher:
             if last_message_id is None:
                 # Initial execution: fetch last 24 hours
                 logger.info(f"Initial fetch for {chat_name} - retrieving last 24 hours")
-                cutoff_time = datetime.now() - timedelta(hours=24)
+                cutoff_time = datetime.now(timezone.utc) - timedelta(hours=24)
 
                 async for message in self.client.iter_messages(chat, reverse=False):
                     if message.date < cutoff_time:
@@ -102,12 +104,11 @@ class MessageFetcher:
         # Get sender information
         sender_name = "Unknown"
         if message.sender:
-            sender_name = (
-                getattr(message.sender, "first_name", "") + " " +
-                getattr(message.sender, "last_name", "")
-            ).strip()
+            first_name = getattr(message.sender, "first_name", None) or ""
+            last_name = getattr(message.sender, "last_name", None) or ""
+            sender_name = (first_name + " " + last_name).strip()
             if not sender_name:
-                sender_name = getattr(message.sender, "username", "Unknown")
+                sender_name = getattr(message.sender, "username", None) or "Unknown"
 
         return {
             "message_id": message.id,
@@ -130,7 +131,9 @@ class MessageFetcher:
             Latest message ID or None if chat is empty
         """
         try:
-            chat = await self.client.get_entity(chat_id)
+            # Convert numeric chat_id to integer for group chats
+            entity_id = int(chat_id) if chat_id.lstrip('-').isdigit() else chat_id
+            chat = await self.client.get_entity(entity_id)
 
             async for message in self.client.iter_messages(chat, limit=1):
                 logger.debug(f"Latest message ID in {chat_id}: {message.id}")
