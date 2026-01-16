@@ -1,11 +1,78 @@
 target_chats:
-  - chat_id: "example_channel"
-    name: "サンプルチャット"
+  - chat_id: "dbnewsdelayed"
+    name: "DB News"
+    enabled: true
+
+  - chat_id: "jussycalls"
+    name: "JUSSY CLUB"
+    enabled: true
+
+  - chat_id: "AirdropAdventureYT"
+    name: "Pranjal | Airdrop Adventure"
+    enabled: true
+
+  - chat_id: "mlmonchain"
+    name: "Mlm onchain"
+    enabled: true
+
+  - chat_id: "defillama_tg"
+    name: "DefiLlama Official Round Up"
+    enabled: true
+
+  - chat_id: "2084340639"
+    name: "Joe's Daily HODL"
+    enabled: true
+
+  - chat_id: "ico_analytic"
+    name: "ICO Analytics (StandWithUkraine)"
+    enabled: true
+
+  - chat_id: "thedailyape"
+    name: "The Daily Ape (On Break)"
+    enabled: true
+
+  - chat_id: "KudasaiJP"
+    name: "CryptoKudasaiJP"
+    enabled: true
+
+  - chat_id: "base_Japanese"
+    name: "Base Community"
     enabled: true
 
 filters:
-  min_message_length: 10
+  min_message_length: 15
   exclude_patterns:
+    # 日本語の挨拶
     - "^おはよう$"
     - "^ありがとう$"
     - "^了解$"
+    # 英語の挨拶・スラング
+    - "^gm$"
+    - "^gn$"
+    - "^hi$"
+    - "^hello$"
+    - "^hey$"
+    # Web3/暗号通貨スラング
+    - "^wagmi$"
+    - "^ngmi$"
+    - "^wen$"
+    - "^ser$"
+    - "^anon$"
+    - "^fren$"
+    # リアクション系
+    - "^lol$"
+    - "^lmao$"
+    - "^lmfao$"
+    - "^rofl$"
+    - "^nice$"
+    - "^cool$"
+    - "^ok$"
+    - "^okay$"
+    - "^thanks$"
+    - "^thank you$"
+    # 絵文字のみ（よくあるパターン）
+    - "^👍$"
+    - "^🔥$"
+    - "^💎$"
+    - "^🚀$"
+    - "^⬆️$"
