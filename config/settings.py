@@ -52,11 +52,17 @@ class Settings:
             "GOOGLE_CREDENTIALS_PATH",
             "./credentials/google_credentials.json"
         )
+        self.google_doc_id = os.getenv("GOOGLE_DOC_ID", "").strip() or None
 
         # Execution settings
         self.timezone = os.getenv("TIMEZONE", "Asia/Tokyo")
         self.execution_time = os.getenv("EXECUTION_TIME", "09:00")
         self.log_level = os.getenv("LOG_LEVEL", "INFO")
+
+        # Markdown backup retention (days)
+        self.markdown_backup_retention_days = int(
+            os.getenv("MARKDOWN_BACKUP_RETENTION_DAYS", "30")
+        )
 
     @property
     def target_chats(self) -> List[Dict]:

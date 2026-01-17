@@ -186,6 +186,79 @@ class GoogleDocsClient:
             logger.error(f"Failed to insert content: {e}")
             raise
 
+    def update_document(self, doc_id: str, title: str, content: str) -> Dict:
+        """
+        Update an existing Google Docs document by replacing all content.
+
+        Args:
+            doc_id: Document ID to update
+            title: New document title
+            content: New Markdown content to replace existing content
+
+        Returns:
+            Dictionary with document_id and document_url
+
+        Raises:
+            Exception: If document update fails
+        """
+        try:
+            logger.info(f"Updating Google Doc (ID: {doc_id})")
+
+            # Get current document to find content length
+            doc = self.service.documents().get(documentId=doc_id).execute()
+
+            # Get the end index (total length of document)
+            content_end_index = doc.get('body', {}).get('content', [{}])[-1].get('endIndex', 1)
+
+            # Prepare batch update requests
+            requests = []
+
+            # 1. Delete all existing content (except the first character at index 1)
+            if content_end_index > 1:
+                requests.append({
+                    'deleteContentRange': {
+                        'range': {
+                            'startIndex': 1,
+                            'endIndex': content_end_index - 1,
+                        }
+                    }
+                })
+
+            # 2. Insert new content
+            requests.append({
+                'insertText': {
+                    'location': {
+                        'index': 1,
+                    },
+                    'text': content
+                }
+            })
+
+            # Execute batch update
+            self.service.documents().batchUpdate(
+                documentId=doc_id,
+                body={'requests': requests}
+            ).execute()
+
+            logger.info(f"Content updated in document {doc_id}")
+
+            # Note: Google Docs API doesn't support updating document title after creation
+            # The title is set only when the document is first created
+
+            # Generate document URL
+            doc_url = f"https://docs.google.com/document/d/{doc_id}/edit"
+
+            logger.info(f"Document URL: {doc_url}")
+
+            return {
+                'document_id': doc_id,
+                'document_url': doc_url,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to update document {doc_id}: {e}")
+            raise
+
     def get_document(self, doc_id: str) -> Dict:
         """
         Get document metadata.

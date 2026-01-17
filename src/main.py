@@ -212,7 +212,9 @@ async def main_async(args) -> int:
 
         # Save Markdown
         logger.info("Saving Markdown...")
-        markdown_builder = MarkdownBuilder()
+        markdown_builder = MarkdownBuilder(
+            retention_days=settings.markdown_backup_retention_days
+        )
         markdown_path = markdown_builder.save_markdown(organized_content)
         logger.info(f"Markdown saved to: {markdown_path}")
 
@@ -225,16 +227,26 @@ async def main_async(args) -> int:
         elif args.test:
             logger.info("[TEST MODE] Skipping Google Docs upload")
         else:
-            logger.info("Uploading to Google Docs...")
             try:
                 google_docs_client = GoogleDocsClient()
                 doc_title = f"Telegram Messages - {datetime.now().strftime('%Y-%m-%d')}"
-                doc_info = google_docs_client.create_document(doc_title, organized_content)
+
+                # Check if fixed document ID is configured
+                if settings.google_doc_id:
+                    logger.info(f"Updating existing Google Doc (ID: {settings.google_doc_id})...")
+                    doc_info = google_docs_client.update_document(
+                        settings.google_doc_id,
+                        doc_title,
+                        organized_content
+                    )
+                    logger.info(f"Document updated: {doc_info['document_url']}")
+                else:
+                    logger.info("Creating new Google Doc...")
+                    doc_info = google_docs_client.create_document(doc_title, organized_content)
+                    logger.info(f"Document created: {doc_info['document_url']}")
 
                 document_id = doc_info["document_id"]
                 document_url = doc_info["document_url"]
-
-                logger.info(f"Document created: {document_url}")
 
             except Exception as e:
                 logger.error(f"Failed to upload to Google Docs: {e}")
